@@ -42,8 +42,6 @@ public class DeskContext {
      */
 	public static void registerInitBean(Object instance) {
 	    Class<?> clazz = instance.getClass();
-
-	    System.out.println(clazz);
 	    
 	    // 1. Кладём сам прокси по его классу
 	    beans.put(clazz, instance);
@@ -68,7 +66,6 @@ public class DeskContext {
 	}
 
 	public static void injectDependencies(Object target) {
-		System.out.println(target.getClass());
 		for (Field field : target.getClass().getDeclaredFields()) {
 			if (field.isAnnotationPresent(Inject.class)) {
 				Object dependency = beans.get(field.getType());

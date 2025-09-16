@@ -17,6 +17,24 @@
 
 ## 📦 Установка
 *(раздел в разработке — будет добавлен в будущих версиях)*
+### Maven
+Добавьте зависимости в ваш `pom.xml`:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>io.github.aim-41tt</groupId>
+        <artifactId>desk-boot</artifactId>
+        <version>X.X.X</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>X.X.X</version>
+    </dependency>
+</dependencies>
+```
 
 ---
 

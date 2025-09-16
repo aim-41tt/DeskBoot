@@ -15,6 +15,7 @@
  */
 package io.github.aim_41tt.deskboot.core.start;
 
+import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import io.github.aim_41tt.deskboot.banner.BannerPrinter;
@@ -23,6 +24,7 @@ import io.github.aim_41tt.deskboot.context.Component;
 import io.github.aim_41tt.deskboot.context.DeskContext;
 import io.github.aim_41tt.deskboot.core.AnnotationScanner;
 import io.github.aim_41tt.deskboot.core.PageRegistry;
+import io.github.aim_41tt.deskboot.core.module.ModuleManager;
 import io.github.aim_41tt.deskboot.core.page.DeskPage;
 import io.github.aim_41tt.deskboot.core.page.PageNavigator;
 import io.github.aim_41tt.deskboot.core.page.annotation.MainPage;
@@ -53,6 +55,15 @@ public class Desk {
 			Set<Class<?>> pageClasses = AnnotationScanner.scan(basePackage, Page.class);
 			Set<Class<?>> componentClasses = AnnotationScanner.scan(basePackage, Component.class);
 
+			 // Загружаем модули
+	        ModuleManager moduleManager = new ModuleManager();
+	        moduleManager.loadModules(appClass);
+	        // Сканируем пользовательские аннотации из модулей
+	        for (Class<? extends Annotation> ann : moduleManager.getRegistrar().getCustomAnnotations()) {
+	            Set<Class<?>> annotated = AnnotationScanner.scan(basePackage, ann);
+	            annotated.forEach(cls -> DeskContext.registerBean(cls));
+	        }
+			
 			PageRegistry registry = new PageRegistry();
 			Class<? extends DeskPage> startPage = null;
 
