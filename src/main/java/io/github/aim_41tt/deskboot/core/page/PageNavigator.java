@@ -28,7 +28,7 @@ import io.github.aim_41tt.deskboot.core.ui.UI;
 
 /**
  * @author aim_41tt
- * @version 1.0
+ * @version 1.1
  * @since 9.09.2025
  */
 public class PageNavigator {
@@ -69,11 +69,16 @@ public class PageNavigator {
 			frame.add(panel, BorderLayout.CENTER);
 			frame.revalidate();
 			frame.repaint();
-			frame.setTitle(title + " - " + pageClass.getAnnotation(Page.class).title());
+
+			String pageTitle = pageClass.getAnnotation(Page.class).title();
+
+			frame.setTitle((pageTitle != null && !pageTitle.isEmpty()) ? title + " - " + pageTitle : title);
 			frame.setVisible(true);
 			if (currentPath.size() == 0 || !currentPath.peek().equals(pageClass.getAnnotation(Page.class).path())) {
 				currentPath.push(path);
 			}
+		} catch (RuntimeException e) {
+			System.err.println(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -82,6 +87,5 @@ public class PageNavigator {
 	public static void back() {
 		currentPath.pop();
 		go(currentPath.peek());
-
 	}
 }
