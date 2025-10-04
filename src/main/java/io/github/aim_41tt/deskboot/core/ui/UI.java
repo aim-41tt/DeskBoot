@@ -18,6 +18,7 @@ package io.github.aim_41tt.deskboot.core.ui;
 import java.awt.LayoutManager;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,84 +30,133 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * @author aim_41tt
- * @version 1.0
+ * @version 2.0
  * @since 9.09.2025
  */
 public class UI {
-	private JPanel panel;
+	private final JPanel panel;
+
+	public UI() {
+		this.panel = new JPanel();
+	}
+
+	public UI(LayoutManager layout) {
+		this.panel = new JPanel(layout);
+	}
 
 	public UI(JPanel panel) {
 		this.panel = panel;
-
-		// time status off
-		// dev deff Layout
-//		this.panel.setLayout(new GridLayout(2, 2));
 	}
 
-	public void add(JComponent component) {
-		panel.add(component);
-	}
-
-	public JLabel label(String text) {
-		JLabel jl = new JLabel(text);
-		panel.add(jl);
-		return jl;
-	}
-
-	public JButton button(String text, Runnable action) {
-		JButton btn = new JButton(text);
-		btn.addActionListener(e -> action.run());
-		panel.add(btn);
-		return btn;
-	}
-
-	public JTextField textField(String placeholder) {
-		if (placeholder != null) {
-			panel.add(new JLabel(placeholder));
-		}
-		return textField();
-	}
-
-	public JTextField textField() {
-		JTextField textField = new JTextField();
-		panel.add(textField);
-		return textField;
-	}
-
-	public JPasswordField passwordField(String placeholder) {
-		if (placeholder != null) {
-			panel.add(new JLabel(placeholder));
-		}
-		return passwordField();
-	}
-
-	public JPasswordField passwordField() {
-		JPasswordField passwordField = new JPasswordField();
-		panel.add(passwordField);
-		return passwordField;
-	}
-
-	public JScrollPane tableScroll(Object[][] data, Object[] columnNames, String type) {
-		DefaultTableModel model = new DefaultTableModel(data, columnNames);
-		JTable table = new JTable(model);
-		JScrollPane pane = new JScrollPane(table);
-		panel.add(pane, type);
-		return pane;
-	}
-
-	public void repaint() {
-		panel.repaint();
-	}
-
-	public void setLayout(LayoutManager mgr) {
-		panel.setLayout(mgr);
-	}
-
-	/**
-	 * @return the panel
-	 */
 	public JPanel getPanel() {
 		return panel;
 	}
 
+	public UI layout(LayoutManager layout) {
+		panel.setLayout(layout);
+		return this;
+	}
+
+	public UI add(JComponent component, Object constraints) {
+		if (constraints != null) {
+			panel.add(component, constraints);
+		} else {
+			panel.add(component);
+		}
+		return this;
+	}
+
+	public UI add(JComponent component) {
+		return add(component, null);
+	}
+
+	public JLabel label(String text, Integer swingConstants, Object constraints) {
+		JLabel label = (swingConstants == null) ? new JLabel(text) : new JLabel(text, swingConstants);
+		add(label, constraints);
+		return label;
+	}
+
+	public JLabel label(String text) {
+		return label(text, null, null);
+	}
+
+	public JLabel label(String text, Integer swingConstants) {
+		return label(text, swingConstants, null);
+	}
+
+	public JButton button(String text, Runnable action, Object constraints) {
+		JButton btn = new JButton(text);
+		if (action != null) {
+			btn.addActionListener(e -> action.run());
+		}
+		add(btn, constraints);
+		return btn;
+	}
+
+	public JButton button(String text, Runnable action) {
+		return button(text, action, null);
+	}
+
+// -----
+	public JTextField textField(String labelText, Object constraints) {
+		if (labelText != null && !labelText.isEmpty()) {
+			label(labelText, null);
+		}
+		JTextField tf = new JTextField();
+		add(tf, constraints);
+		return tf;
+	}
+
+	public JTextField textField(String lableText) {
+		return textField(lableText, null);
+	}
+
+	public JTextField textField(Object constraints) {
+		return textField(null, constraints);
+	}
+
+// -----
+	public JPasswordField passwordField(String labelText, Object constraints) {
+		if (labelText != null && !labelText.isEmpty()) {
+			label(labelText, null);
+		}
+		JPasswordField pf = new JPasswordField();
+		add(pf, constraints);
+		return pf;
+	}
+
+	public JPasswordField passwordField(String labelText) {
+		return passwordField(labelText, null);
+	}
+
+	public JPasswordField passwordField(Object constraints) {
+		return passwordField(null, constraints);
+	}
+
+	public JScrollPane table(Object[][] data, Object[] columns, Object constraints) {
+		JTable table = new JTable(new DefaultTableModel(data, columns));
+		JScrollPane scroll = new JScrollPane(table);
+		add(scroll, constraints);
+		return scroll;
+	}
+
+// --------------COMBO-BOX------------------
+	public <T> JComboBox<T> comboBox(T[] data, Runnable action, Object constraints) {
+		JComboBox<T> comboBox = new JComboBox(data);
+		comboBox.setSelectedIndex(0);
+		comboBox.addActionListener(e -> action.run());
+		add(comboBox, constraints);
+		return comboBox;
+	}
+
+	public UI nested(LayoutManager layout, Object constraints) {
+		JPanel nested = new JPanel(layout);
+		add(nested, constraints);
+		return new UI(nested);
+	}
+
+	public void repaint() {
+		panel.revalidate();
+		panel.repaint();
+	}
 }
