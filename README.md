@@ -73,11 +73,17 @@ public class MainPage extends DeskPage {
 
     @Override
     public void render(UI ui) {
-        ui.label("Добро пожаловать в DeskBoot!");
+        ui.layout(new GridLayout(3,1));
+		
+        ui.label("Добро пожаловать в DeskBoot!")
+        .center()
+        .build();
 
-        ui.button("Перейти на домашнюю страницу", () -> {
+        ui.button("Перейти на домашнюю страницу")
+        .onClick( () -> {
             PageNavigator.go("/home");
-        });
+        })
+        .build();
 
         Object[][] data = {
             {1, "Иван", "ivan@example.com"},
@@ -85,10 +91,12 @@ public class MainPage extends DeskPage {
             {3, "Пётр", "petr@example.com"},
             {4, "Анна", "anna@example.com"}
         };
-
         Object[] columnNames = {"ID", "Имя", "Email"};
+        
+        ui.table()
+        .createTable(data, columnNames)
+        .build();
 
-        ui.tableScroll(data, columnNames, null);
 
         // Примеры всплывающих сообщений:
         // MessageUtil.error("Ошибка!");
@@ -97,7 +105,8 @@ public class MainPage extends DeskPage {
     }
 }
 ```
-
+## 📸 Скриншот интерфейса (MainPage)
+![Главное окно DeskBoot](img/DeekPage.png)
 ---
 
 ## 📄 Лицензия

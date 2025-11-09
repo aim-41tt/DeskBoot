@@ -15,18 +15,18 @@
  */
 package io.github.aim_41tt.deskboot.core.ui;
 
+import java.awt.Component;
 import java.awt.LayoutManager;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
+
+import io.github.aim_41tt.deskboot.core.ui.dsl.UIButtonBuilder;
+import io.github.aim_41tt.deskboot.core.ui.dsl.UIJScrollPaneBuilder;
+import io.github.aim_41tt.deskboot.core.ui.dsl.UILabelBuilder;
+import io.github.aim_41tt.deskboot.core.ui.dsl.UIPasswordFieldBuilder;
+import io.github.aim_41tt.deskboot.core.ui.dsl.UITextFieldBuilder;
+import io.github.aim_41tt.deskboot.core.ui.dsl.UIComboBoxBuilder;
 
 /**
  * @author aim_41tt
@@ -35,14 +35,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public class UI {
 	private final JPanel panel;
-
-	public UI() {
-		this.panel = new JPanel();
-	}
-
-	public UI(LayoutManager layout) {
-		this.panel = new JPanel(layout);
-	}
 
 	public UI(JPanel panel) {
 		this.panel = panel;
@@ -57,106 +49,87 @@ public class UI {
 		return this;
 	}
 
-	public UI add(JComponent component, Object constraints) {
-		if (constraints != null) {
-			panel.add(component, constraints);
-		} else {
-			panel.add(component);
+	// ---- DSL BUILDERS ----
+	// ---label---
+	public UILabelBuilder label(String text) {
+		return new UILabelBuilder(this, text);
+	}
+
+	// ---textField---
+	public UITextFieldBuilder textField(String labelText) {
+		return new UITextFieldBuilder(this, labelText);
+	}
+
+	public UITextFieldBuilder textField() {
+		return new UITextFieldBuilder(this);
+	}
+
+	// ---passwordField---
+	public UIPasswordFieldBuilder passwordField(String labelText) {
+		return new UIPasswordFieldBuilder(this, labelText);
+	}
+
+	public UIPasswordFieldBuilder passwordField() {
+		return new UIPasswordFieldBuilder(this);
+	}
+
+	// ---button---
+	public UIButtonBuilder button(String text) {
+		return new UIButtonBuilder(this, text);
+	}
+
+	// ---table---
+	public UIJScrollPaneBuilder table() {
+		return new UIJScrollPaneBuilder(this);
+	}
+
+	// ---comboBox---
+	public <T> UIComboBoxBuilder<T> comboBox(String labelText) {
+		return new UIComboBoxBuilder<>(this, labelText);
+	}
+
+	public <T> UIComboBoxBuilder<T> comboBox() {
+		return new UIComboBoxBuilder<>(this);
+	}
+
+	// ---- UTILS ----
+	public void addComponent(Component comp) {
+		panel.add(comp);
+	}
+
+	public java.util.Map<String, JComponent> components = new java.util.HashMap<>();
+
+	public void register(String id, javax.swing.JComponent comp) {
+		if (id != null)
+			components.put(id, comp);
+	}
+
+	public String getText(String id) {
+		var comp = components.get(id);
+		if (comp instanceof javax.swing.JTextField tf) {
+			return tf.getText();
 		}
-		return this;
+		return null;
 	}
 
-	public UI add(JComponent component) {
-		return add(component, null);
-	}
-
-	public JLabel label(String text, Integer swingConstants, Object constraints) {
-		JLabel label = (swingConstants == null) ? new JLabel(text) : new JLabel(text, swingConstants);
-		add(label, constraints);
-		return label;
-	}
-
-	public JLabel label(String text) {
-		return label(text, null, null);
-	}
-
-	public JLabel label(String text, Integer swingConstants) {
-		return label(text, swingConstants, null);
-	}
-
-	public JButton button(String text, Runnable action, Object constraints) {
-		JButton btn = new JButton(text);
-		if (action != null) {
-			btn.addActionListener(e -> action.run());
+	public String getPassword(String id) {
+		var comp = components.get(id);
+		if (comp instanceof javax.swing.JPasswordField pf) {
+			return new String(pf.getPassword());
 		}
-		add(btn, constraints);
-		return btn;
+		return null;
 	}
 
-	public JButton button(String text, Runnable action) {
-		return button(text, action, null);
-	}
-
-// -----
-	public JTextField textField(String labelText, Object constraints) {
-		if (labelText != null && !labelText.isEmpty()) {
-			label(labelText, null);
+	@SuppressWarnings("unchecked")
+	public <T> T getSelectedItem(String id) {
+		var comp = components.get(id);
+		if (comp instanceof javax.swing.JComboBox<?> cb) {
+			return (T) cb.getSelectedItem();
 		}
-		JTextField tf = new JTextField();
-		add(tf, constraints);
-		return tf;
-	}
-
-	public JTextField textField(String lableText) {
-		return textField(lableText, null);
-	}
-
-	public JTextField textField(Object constraints) {
-		return textField(null, constraints);
-	}
-
-// -----
-	public JPasswordField passwordField(String labelText, Object constraints) {
-		if (labelText != null && !labelText.isEmpty()) {
-			label(labelText, null);
-		}
-		JPasswordField pf = new JPasswordField();
-		add(pf, constraints);
-		return pf;
-	}
-
-	public JPasswordField passwordField(String labelText) {
-		return passwordField(labelText, null);
-	}
-
-	public JPasswordField passwordField(Object constraints) {
-		return passwordField(null, constraints);
-	}
-
-	public JScrollPane table(Object[][] data, Object[] columns, Object constraints) {
-		JTable table = new JTable(new DefaultTableModel(data, columns));
-		JScrollPane scroll = new JScrollPane(table);
-		add(scroll, constraints);
-		return scroll;
-	}
-
-// --------------COMBO-BOX------------------
-	public <T> JComboBox<T> comboBox(T[] data, Runnable action, Object constraints) {
-		JComboBox<T> comboBox = new JComboBox(data);
-		comboBox.setSelectedIndex(0);
-		comboBox.addActionListener(e -> action.run());
-		add(comboBox, constraints);
-		return comboBox;
-	}
-
-	public UI nested(LayoutManager layout, Object constraints) {
-		JPanel nested = new JPanel(layout);
-		add(nested, constraints);
-		return new UI(nested);
+		return null;
 	}
 
 	public void repaint() {
-		panel.revalidate();
 		panel.repaint();
 	}
 }
